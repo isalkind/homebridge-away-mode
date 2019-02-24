@@ -1,11 +1,14 @@
 {
   "name": "homebridge-away-mode",
-  "version": "1.0.0",
-  "description": "Trigger sensors on and off randomly",
+  "version": "1.1.0",
+  "description": "Trigger sensors on and off randomly to simulate occupancy",
   "license": "MIT",
   "keywords": [
     "homebridge-plugin",
-    "homebridge"
+    "homebridge",
+    "vacation",
+    "away",
+    "random"
   ],
   "repository": {
     "type": "git",
@@ -17,5 +20,9 @@
   "engines": {
     "node": ">=6.0.0",
     "homebridge": ">=0.2.0"
+  },
+  "dependencies": {
+    "hh-mm-ss": ">=1.2.0",
+    "suncalc": ">=1.8.0"
   }
 }
