@@ -114,6 +114,7 @@ This setup makes sense when you want to make sure the automation always runs whe
 Parameters in the table above are optional, except 'accessory' which must be set to 'AwayMode', and need not be specified if you are happy with the default value.
 
 Time examples:
+
 | startTime | endTime | Offset |Description |
 | --------- | ------- | ------ | ----------- |
 | "08:00" | "20:00" | NA | Span the hours from 8am to 8pm |
