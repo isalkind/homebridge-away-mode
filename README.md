@@ -61,8 +61,12 @@ config.json:
         "maxOffTime": 1800,
         "minOnTime": 1800,
         "maxOnTime": 3600,
-        "startTime": "sunset",
-        "endTime": "22:00",
+        "activeTimes": [
+            {
+                "start": "sunset",
+                "end": "22:00"
+            }
+        ]
         "location": {
             "lat": 40.689510,
             "long": -74.044500
@@ -106,8 +110,9 @@ This setup makes sense when you want to make sure the automation always runs whe
 | maxOffTime | Maximum off time (secs) | 1800 |
 | minOnTime | Minimum on time (secs) | 1800 |
 | maxOnTime | Maximum on time (secs) | 3600 |
-| startTime | Time at which triggers should start to fire<br>("hh:mm"\|"sunrise"\|"sunset") | "00:00" |
-| endTime | Time at which triggers should stop firing<br>("hh:mm"\|"sunrise"\|"sunset")| "23:59" |
+| startTime | Time at which triggers should start to fire<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter | "00:00" |
+| endTime | Time at which triggers should stop firing<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter | "23:59" |
+| activeTimes | Array of start/end times for periods when triggers should fire.<br>Set start/end times as: ("hh:mm"\|"sunrise"\|"sunset") | [{"start": "00:00", "end": "23:59"}] |
 | location | Lat/long location to compute sunrise/sunset from. Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"lat": x, "long": y}) <br><br>Find your location: [Google Maps location finder](https://google-developers.appspot.com/maps/documentation/utils/geocoder/) | {"lat": 0, "long": 0} |
 | offset | Offset information for sunrise/sunset. Offset is in minutes. May be negative (before) or positive (after). Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"sunrise": mins, "sunset": mins}) | {"sunrise": 0, "sunset": 0} |
 
