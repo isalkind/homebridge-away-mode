@@ -24,6 +24,7 @@
 // maxOnTime - Maximum off time (seconds). (3600)
 // startTime - Time at which triggers should start to fire (hh:mm|sunrise|sunset). (00:00)
 // endTime - Time at which triggers should stop firing (hh:mm|sunrise|sunset). (23:59)
+// activeTimes - Array of start/end times (see startTime/endTime)
 // location - lat/long location to compute sunrise/sunset from ({lat: x, long: y}). ({lat: 0, long: 0})
 // offset - Offset information for sunrise/sunset ({sunrise: mins, sunset: mins}). ({sunrise: 0, sunset: 0})
 //
@@ -62,12 +63,14 @@ class AwayMode {
 
         this.startTime = config["startTime"] || "00:00"; // hh:mm|sunrise|sunset
         this.endTime = config["endTime"] || "23:59";     // hh:mm|sunrise|sunset
+        this.activeTimes = config["activeTimes"] || [{start:this.startTime, end:this.endTime}];
 
         // https://google-developers.appspot.com/maps/documentation/utils/geocoder/
         this.location = config["location"] || {lat:0, long:0};
         this.offset = config["offset"] || {sunrise:0, sunset:0}; // 0 min (mins)
 
-        // This call computes side-effects.
+        // This call computes side-effects - activeSeconds
+        this.activeSeconds = new Array(this.activeTimes.length);
         this.computeStartEndTimes();
 
         // Multiplier to get to timer values (in milliseconds)
@@ -162,23 +165,24 @@ class AwayMode {
     // this method will be called at midnight every day.
     //
     // *** Side effects ***
-    // Sets the values for this.startTime and this.endTime
+    // Sets the values for this.activeSeconds
     //
     computeStartEndTimes() {
         let dynamic = false;
 
         let times = SunCalc.getTimes(new Date(), this.location.lat, this.location.long);
 
-        let startInfo = this.computeSecondsFromMidnight(times, this.startTime, this.offset);
-        this.startSeconds = startInfo.seconds;
-        dynamic = startInfo.dynamic;
+        // Examine each of the defined ranges
+        for (let i=0; i<this.activeTimes.length; i++) {
+            let startInfo = this.computeSecondsFromMidnight(times, this.activeTimes[i].start, this.offset);
+            let endInfo = this.computeSecondsFromMidnight(times, this.activeTimes[i].end, this.offset);
+            dynamic = dynamic || startInfo.dynamic || endInfo.dynamic;
 
-        let endInfo = this.computeSecondsFromMidnight(times, this.endTime, this.offset);
-        this.endSeconds = endInfo.seconds;
-        dynamic = dynamic || endInfo.dynamic;
+            this.activeSeconds[i] = {start: startInfo.seconds, end: endInfo.seconds};
 
-        this.log("Start: " + this.secondsToHourMinSec(this.startSeconds) +
-                 " End: " + this.secondsToHourMinSec(this.endSeconds));
+            this.log("[" + i + "] Start: " + this.secondsToHourMinSec(this.activeSeconds[i].start) +
+                     " End: " + this.secondsToHourMinSec(this.activeSeconds[i].end));
+        }
 
         // Set a timer to expire at midnight so we can recalculate the
         // values of sunrise & sunset (if needed)
@@ -195,23 +199,32 @@ class AwayMode {
 
     //
     // Return true if the sensor should be turned on. I.e., now falls
-    // withing the startTime / endTime range.
+    // within the startSeconds / endSeconds range.
     //
     sensorOnTime() {
         let now = new Date();
         let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
 
-        this.log("[" + this.secondsToHourMinSec(this.startSeconds) + " - " + this.secondsToHourMinSec(this.endSeconds) + "] --> " + this.secondsToHourMinSec(currentSeconds));
+        let turnOn = false;
 
-        // start / end w/in same day, e.g. 08:00 - 20:00
-        if (this.startSeconds <= this.endSeconds) {
-            return (this.startSeconds < currentSeconds) && (currentSeconds < this.endSeconds);
+        // Examine each of the defined ranges
+        for (let i=0; i<this.activeSeconds.length && turnOn == false; i++) {
+            let activeInterval = this.activeSeconds[i];
+
+            this.log("[" + i + "] [" + this.secondsToHourMinSec(activeInterval.start) + " - " + this.secondsToHourMinSec(activeInterval.end) + "] --> " + this.secondsToHourMinSec(currentSeconds));
+
+            // start / end w/in same day, e.g. 08:00 - 20:00
+            if (activeInterval.start <= activeInterval.end) {
+                turnOn = (activeInterval.start < currentSeconds) && (currentSeconds < activeInterval.end);
+            }
+
+            // start / end span days, e.g. 20:00 - 08:00
+            else {
+                turnOn = (activeInterval.start < currentSeconds) || (currentSeconds < activeInterval.end);
+            }
         }
 
-        // start / end span days, e.g. 20:00 - 08:00
-        else {
-            return (this.startSeconds < currentSeconds) || (currentSeconds < this.endSeconds);
-        }
+        return turnOn;
     }
 
     //
