@@ -17,9 +17,13 @@ config.json:
     {
         "accessory": "AwayMode",
         "name": "Away Mode",
-        "sensorNames": [
-            "Trigger 1",
-            "Trigger 2"
+        "sensors": [
+            {
+                "name": "Trigger1"
+            },
+            {
+                "name": "Trigger2"
+            }
         ],
         "minOffTime": 300,
         "maxOffTime": 1800,
@@ -53,9 +57,13 @@ config.json:
     {
         "accessory": "AwayMode",
         "name": "Away Mode",
-        "sensorNames": [
-            "Trigger 1",
-            "Trigger 2"
+        "sensors": [
+            {
+                "name": "Trigger1"
+            },
+            {
+                "name": "Trigger2"
+            }
         ],
         "minOffTime": 300,
         "maxOffTime": 1800,
@@ -105,14 +113,15 @@ This setup makes sense when you want to make sure the automation always runs whe
 | ------------- | ------------- | -------- |
 | accessory | **Must be set to "AwayMode"**
 | name | The name of the switch | "Away Mode" |
-| sensorNames | Array of names for each sensor to be created | ["Trigger 1"] |
+| sensorNames | Array of names for each sensor to be created<br><br>**DEPRECATED** - See 'sensors' parameter | ["Trigger 1"] |
+| sensors | Array of per-sensor information.<br><br>Each sensor object **MUST** contain "name" and **MAY** contain "minOffTime", "maxOffTime", "minOnTime", "maxOnTime". These *time* parameters override the globally defined *time* parameters if specified.<br><br>Example 1: [{"name": "Trigger1"}]<br>Set sensor name, use the global time parameters.<br><br>Example 2: [{"name": "Trigger1", "minOffTime": 27}]<br>Set sensor name, override the 'minOffTime' global time parameter.<br><br>See global time parameters: 'minOffTime', 'minOffTime', 'minOnTime', 'maxOffTime'<br><br>**Note:** If the 'sensors' parameter is specified, the 'sensorNames' parameter will be ignored. | [{"name": "Trigger1"}] |
 | minOffTime | Minimum off time (secs) | 300 |
 | maxOffTime | Maximum off time (secs) | 1800 |
 | minOnTime | Minimum on time (secs) | 1800 |
 | maxOnTime | Maximum on time (secs) | 3600 |
 | startTime | Time at which triggers should start to fire<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter | "00:00" |
 | endTime | Time at which triggers should stop firing<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter | "23:59" |
-| activeTimes | Array of start/end times for periods when triggers should fire.<br>Set start/end times as: ("hh:mm"\|"sunrise"\|"sunset") | [{"start": "00:00", "end": "23:59"}] |
+| activeTimes | Array of start/end times for periods when triggers should fire.<br>Set start/end times as: ("hh:mm"\|"sunrise"\|"sunset")<br><br>Example: [{"start": "sunset", "end": "22:00"}] | [{"start": "00:00", "end": "23:59"}] |
 | location | Lat/long location to compute sunrise/sunset from. Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"lat": x, "long": y}) <br><br>Find your location: [Google Maps location finder](https://google-developers.appspot.com/maps/documentation/utils/geocoder/) | {"lat": 0, "long": 0} |
 | offset | Offset information for sunrise/sunset. Offset is in minutes. May be negative (before) or positive (after). Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"sunrise": mins, "sunset": mins}) | {"sunrise": 0, "sunset": 0} |
 

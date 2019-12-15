@@ -18,6 +18,7 @@
 //
 // name - The name of the switch. ("Away Mode")
 // sensorNames - Array of names for each sensor to be created. (["Trigger 1"])
+// sensors - Array of per-sensor information.
 // minOffTime - Minimum off time (seconds). (300)
 // maxOffTime - Maximum off time (seconds). (1800)
 // minOnTime - Minimum on time (seconds). (1800)
@@ -54,6 +55,7 @@ class AwayMode {
         this.log = log;
         this.name = config["name"] || "Away Mode";
         this.sensorNames = config["sensorNames"] || ["Trigger 1"];
+        this.sensors = config["sensors"] || [];
 
         // Time in seconds
         this.minOffTime = config["minOffTime"] || 300;  // 5 min (secs)
@@ -89,14 +91,24 @@ class AwayMode {
         }.bind(this))
         .on('set', this.setOn.bind(this));
 
+        // Check for sensors. If they don't exist, we
+        // will create them here. For backwards compatibility.
+        if (this.sensors.length === 0) {
+            for (let x = 0; x < this.sensorNames.length; x++) {
+                this.sensors[x] = {
+                    name: this.sensorNames[x]
+                }
+            }
+        }
+
         // Create motion sensors that will fire randomly
         this.serviceMotions = [];
         this.serviceStates = [];
 
-        for (let x = 1; x <= this.sensorNames.length; x++) {
-            let sensorName = this.sensorNames[x-1];
-            let serviceMotion = new Service.MotionSensor(sensorName, x);
-            this.log("MotionSensor: " + sensorName);
+        for (let x = 1; x <= this.sensors.length; x++) {
+            let sensor = this.sensors[x-1];
+            let serviceMotion = new Service.MotionSensor(sensor.name, x);
+            this.log("MotionSensor: " + sensor.name);
 
             let serviceState = { "motionDetected": false };
 
@@ -107,7 +119,15 @@ class AwayMode {
 
             this.serviceMotions.push(serviceMotion);
             this.serviceStates.push(serviceState);
+
+            // populate sensor defaults if necessary
+            sensor.minOffTime = sensor.minOffTime || this.minOffTime;
+            sensor.maxOffTime = sensor.maxOffTime || this.maxOffTime;
+            sensor.minOnTime = sensor.minOnTime || this.minOnTime;
+            sensor.maxOnTime = sensor.maxOnTime || this.maxOnTime;
         }
+
+        this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
     }
 
     //
@@ -231,10 +251,11 @@ class AwayMode {
     // Turn sensor on after a random amount of off time.
     //
     startOnTimer(id) {
-        const sensor = this.serviceMotions[id];
+        const serviceMotion = this.serviceMotions[id];
         const serviceState = this.serviceStates[id];
+        const sensor = this.sensors[id];
 
-        let time = parseInt(Math.floor(Math.random() * (this.maxOffTime - this.minOffTime + 1) + this.minOffTime));
+        let time = parseInt(Math.floor(Math.random() * (sensor.maxOffTime - sensor.minOffTime + 1) + sensor.minOffTime));
         let now = new Date();
         let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
         this.log("Starting on timer for sensor: " + id + ", delay: " + time +
@@ -244,7 +265,7 @@ class AwayMode {
             // Only turn on sensors during allowed times
             if (this.sensorOnTime()) {
                 this.log("Turning motion on for sensor: " + id);
-                sensor.setCharacteristic(Characteristic.MotionDetected, true);
+                serviceMotion.setCharacteristic(Characteristic.MotionDetected, true);
                 serviceState.motionDetected = true;
             }
 
@@ -256,10 +277,11 @@ class AwayMode {
     // Turn sensor off after a random amount of on time.
     //
     startOffTimer(id) {
-        const sensor = this.serviceMotions[id];
+        const serviceMotion = this.serviceMotions[id];
         const serviceState = this.serviceStates[id];
+        const sensor = this.sensors[id];
 
-        let time = parseInt(Math.floor(Math.random() * (this.maxOnTime - this.minOnTime + 1) + this.minOnTime));
+        let time = parseInt(Math.floor(Math.random() * (sensor.maxOnTime - sensor.minOnTime + 1) + sensor.minOnTime));
         let now = new Date();
         let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
         this.log("Starting off timer for sensor: " + id + ", delay: " + time +
@@ -267,7 +289,7 @@ class AwayMode {
 
         serviceState.timeout = setTimeout(function() {
             this.log("Turning motion off for sensor: " + id);
-            sensor.setCharacteristic(Characteristic.MotionDetected, false);
+            serviceMotion.setCharacteristic(Characteristic.MotionDetected, false);
             serviceState.motionDetected = false;
 
             this.startOnTimer(id);
@@ -289,7 +311,7 @@ class AwayMode {
     stopSensor(id) {
         this.log("Stopping sensor: " + id);
 
-        const sensor = this.serviceMotions[id];
+        const serviceMotion = this.serviceMotions[id];
         const serviceState = this.serviceStates[id];
         const motionDetected = serviceState.motionDetected;
         const timeout = serviceState.timeout;
@@ -304,7 +326,7 @@ class AwayMode {
         // Sensor is currently on, turn it off
         if (motionDetected) {
             this.log("Turning motion off for sensor: " + id);
-            sensor.setCharacteristic(Characteristic.MotionDetected, false);
+            serviceMotion.setCharacteristic(Characteristic.MotionDetected, false);
             serviceState.motionDetected = false;
         }
     }
@@ -322,7 +344,7 @@ class AwayMode {
             this.isSwitchOn = true;
 
             // Turn on the sensors
-            for (let x = 0; x < this.sensorNames.length; x++) {
+            for (let x = 0; x < this.sensors.length; x++) {
                 this.startSensor(x);
             }
         }
@@ -335,7 +357,7 @@ class AwayMode {
             this.isSwitchOn = false;
 
             // Turn off the sensors
-            for (let x = 0; x < this.sensorNames.length; x++) {
+            for (let x = 0; x < this.sensors.length; x++) {
                 this.stopSensor(x);
             }
         }
