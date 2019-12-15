@@ -1,6 +1,6 @@
 {
   "name": "homebridge-away-mode",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Trigger sensors on and off randomly to simulate occupancy",
   "license": "MIT",
   "keywords": [
