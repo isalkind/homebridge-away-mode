@@ -1,0 +1,357 @@
+{
+    "pluginAlias": "AwayMode",
+    "pluginType": "accessory",
+    "singular": false,
+    "headerDisplay": "For detailed description of parameters, see: https://github.com/isalkind/homebridge-away-mode",
+    "singular": false,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Switch Name",
+                "type": "string",
+                "default": "Away Mode"
+            },
+            "sensorNames": {
+                "title": "Sensor Name",
+                "type": "array",
+                "items": {
+                    "title": "Name",
+                    "type": "string"
+                }
+            },
+            "sensors": {
+                "title": "Sensor Information",
+                "type": "array",
+                "items": {
+                    "title": "Sensor config",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Sensor Name",
+                            "type": "string",
+                            "required": true
+                        },
+                        "minOffTime": {
+                            "title": "Minimum Off Time",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "maxOffTime": {
+                            "title": "Maximum Off Time",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "minOnTime": {
+                            "title": "Minimum On Time",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "maxOnTime": {
+                            "title": "Maximum On Time",
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                }
+            },
+            "minOffTime": {
+                "title": "Minimum off time",
+                "type": "integer",
+                "minimum": 1
+            },
+            "maxOffTime": {
+                "title": "Maximum off time",
+                    "type": "integer",
+                    "minimum": 1
+            },
+            "minOnTime": {
+                "title": "Minimum on time",
+                "type": "integer",
+                "minimum": 1
+            },
+            "maxOnTime": {
+                "title": "Maximum on time",
+                "type": "integer",
+                "minimum": 1
+            },
+            "startTime": {
+                "title": "Start time",
+                "type": "string"
+            },
+            "endTime": {
+                "title": "End time",
+                "type": "string"
+            },
+            "activeTimes": {
+                "title": "Active Time Periods",
+                "type": "array",
+                "items": {
+                    "title": "Time period",
+                    "type": "object",
+                    "properties": {
+                        "start": {
+                            "title": "Period start",
+                            "type": "string"
+                        },
+                        "end": {
+                            "title": "Period end",
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "location": {
+                "title": "Location to compute sunrise/sunset from",
+                "type": "object",
+                "properties": {
+                    "lat": {
+                        "title": "Latitude",
+                        "type": "number"
+                    },
+                    "long": {
+                        "title": "Longitude",
+                        "type": "number"
+                    }
+                }
+            },
+            "offset": {
+                "title": "Offset information for sunrise/sunset",
+                "type": "object",
+                "properties": {
+                    "sunrise": {
+                        "title": "Sunrise",
+                        "type": "integer"
+                    },
+                    "sunset": {
+                        "title": "Sunset",
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    },
+    "layout": [
+        {
+            "type": "help",
+            "helpvalue": "<h5>Switch Name</h5><em class='primary-text'>The name of the switch that will appear in HomeKit.</em>"
+        },
+        {
+            "key": "name",
+            "notitle": true,
+            "nodescription": true
+        },
+        {
+            "type": "fieldset",
+            "expandable": true,
+            "title": "Sensor Setup",
+            "items": [
+                {
+                    "type": "help",
+                    "helpvalue": "<h5>Sensor Names</h5><em class='primary-text'>The names of the sensors.<br><br>DEPRECATED - See <b>Sensors</b></em>"
+                },
+                {
+                    "key": "sensorNames",
+                    "type": "array",
+                    "nodescription": true,
+                    "notitle": true,
+                    "items": [
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "type": "help",
+                    "helpvalue": "<h5>Sensors</h5><em class='primary-text'>Enter per sensor information. Each sensor will appear with the given name in HomeKit.</em>"
+                },
+                {
+                    "key": "sensors",
+                    "type": "array",
+                    "nodescription": true,
+                    "notitle": true,
+                    "items": [
+                        {
+                            "type": "div",
+                            "displayFlex": true,
+                            "flex-direction": "row",
+                            "flex-wrap": "wrap",
+                            "items": [
+                                {
+                                    "key": "sensors[].name",
+                                    "flex-basis": "100%",
+                                    "nodescription": true
+                                },
+                                {
+                                    "key": "sensors[].minOffTime",
+                                    "flex-basis": "50%",
+                                    "placeholder": "seconds"
+                                },
+                                {
+                                    "key": "sensors[].maxOffTime",
+                                    "flex-basis": "50%",
+                                    "placeholder": "seconds"
+                                },
+                                {
+                                    "key": "sensors[].minOnTime",
+                                    "flex-basis": "50%",
+                                    "placeholder": "seconds"
+                                },
+                                {
+                                    "key": "sensors[].maxOnTime",
+                                    "flex-basis": "50%",
+                                    "placeholder": "seconds"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "fieldset",
+            "expandable": true,
+            "title": "Global Settings",
+            "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Timers</h5><em class='primary-text'>These default timers control how long sensors will remain off or on. Timers specified on a per-sensor basis will override these values.</em>"
+                },
+                {
+                    "type": "div",
+                    "notitle": true,
+                    "displayFlex": true,
+                    "flex-direction": "row",
+                    "flex-wrap": "wrap",
+                    "items": [
+                        {
+                            "key": "minOffTime",
+                            "placeholder": "seconds",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "maxOffTime",
+                            "placeholder": "seconds",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "minOnTime",
+                            "placeholder": "seconds",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "maxOnTime",
+                            "placeholder": "seconds",
+                            "flex-basis": "50%"
+                        }
+                    ]
+                },
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Active Period</h5><em class='primary-text'>Specify the period when sensors will be active.<br><br>DEPRECATED - See <b>Active Times</b></em>"
+                },
+                {
+                    "type": "div",
+                    "notitle": true,
+                    "displayFlex": true,
+                    "flex-direction": "row",
+                    "flex-wrap": "wrap",
+                    "items": [
+                        {
+                            "key": "startTime",
+                            "placeholder": "hh:mm | sunrise | sunset",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "endTime",
+                            "placeholder": "hh:mm | sunrise | sunset",
+                            "flex-basis": "50%"
+                        }
+                    ]
+                },
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Active Times</h5><em class='primary-text'>Specify when sensors will be active.</em>"
+                },
+                {
+                    "key": "activeTimes",
+                    "notitle": true,
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "div",
+                            "displayFlex": true,
+                            "flex-direction": "row",
+                            "flex-wrap": "wrap",
+                            "items": [
+                                {
+                                    "key": "activeTimes[].start",
+                                    "flex-basis": "50%",
+                                    "placeholder": "hh:mm | sunrise | sunset"
+                                },
+                                {
+                                    "key": "activeTimes[].end",
+                                    "flex-basis": "50%",
+                                    "placeholder": "hh:mm | sunrise | sunset"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "fieldset",
+            "expandable": true,
+            "title": "Sunrise/Sunset Setup",
+            "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Location</h5><em class='primary-text'>Location from which sunrise and sunset times should be computed. See <a href=\"https://google-developers.appspot.com/maps/documentation/utils/geocoder/\">Google Maps location finder</a>.</em>"
+                },
+                {
+                    "type": "div",
+                    "notitle": true,
+                    "displayFlex": true,
+                    "flex-direction": "row",
+                    "flex-wrap": "wrap",
+                    "items": [
+                        {
+                            "key": "location.lat",
+                            "placeholder": "latitude",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "location.long",
+                            "placeholder": "longitude",
+                            "flex-basis": "50%"
+                        }
+                    ]
+                },
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Offsets</h5><em class='primary-text'>Specify offsets to sunrise and sunset values. Specify negative values for before. Positive values for after.</em>"
+                },
+                {
+                    "type": "div",
+                    "notitle": true,
+                    "displayFlex": true,
+                    "flex-direction": "row",
+                    "flex-wrap": "wrap",
+                    "items": [
+                        {
+                            "key": "offset.sunrise",
+                            "placeholder": "minutes",
+                            "flex-basis": "50%"
+                        },
+                        {
+                            "key": "offset.sunset",
+                            "placeholder": "minutes",
+                            "flex-basis": "50%"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
