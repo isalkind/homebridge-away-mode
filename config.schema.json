@@ -2,14 +2,15 @@
     "pluginAlias": "AwayMode",
     "pluginType": "accessory",
     "singular": false,
-    "headerDisplay": "For detailed description of parameters, see: <a \"https://github.com/isalkind/homebridge-away-mode\"></a>",
+    "headerDisplay": "For detailed description of parameters, see: https://github.com/isalkind/homebridge-away-mode",
     "singular": false,
     "schema": {
         "type": "object",
         "properties": {
             "name": {
                 "title": "Switch Name",
-                "type": "string"
+                "type": "string",
+                "default": "Away Mode"
             },
             "sensorNames": {
                 "title": "Sensor Name",
@@ -204,10 +205,17 @@
                             ]
                         }
                     ]
-                },
+                }
+            ]
+        },
+        {
+            "type": "fieldset",
+            "expandable": true,
+            "title": "Global Settings",
+            "items": [
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Global Timers</h5><em class='primary-text'>These default timers control how long sensors will remain off or on. Timers specified on a per-sensor basis will override these values.</em>"
+                  "helpvalue": "<h5>Timers</h5><em class='primary-text'>These default timers control how long sensors will remain off or on. Timers specified on a per-sensor basis will override these values.</em>"
                 },
                 {
                     "type": "div",
@@ -237,14 +245,7 @@
                             "flex-basis": "50%"
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "type": "fieldset",
-            "expandable": true,
-            "title": "Sensor Activation",
-            "items": [
+                },
                 {
                   "type": "help",
                   "helpvalue": "<h5>Active Period</h5><em class='primary-text'>Specify the period when sensors will be active.<br><br>DEPRECATED - See <b>Active Times</b></em>"
