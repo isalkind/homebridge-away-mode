@@ -3,6 +3,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.4.2 (2020-01-12)
+
+### Notable Changes
+
+* Updated CHANGELOG. Forgot to do it on 1.4.1.
+
 ## 1.4.1 (2020-01-12)
 
 ### Bug Fixes
