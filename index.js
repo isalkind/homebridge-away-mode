@@ -71,10 +71,6 @@ class AwayMode {
         this.location = config["location"] || {lat:0, long:0};
         this.offset = config["offset"] || {sunrise:0, sunset:0}; // 0 min (mins)
 
-        // This call computes side-effects - activeSeconds
-        this.activeSeconds = new Array(this.activeTimes.length);
-        this.computeStartEndTimes();
-
         // Multiplier to get to timer values (in milliseconds)
         this.multiplier = 1000;
 
@@ -125,9 +121,19 @@ class AwayMode {
             sensor.maxOffTime = sensor.maxOffTime || this.maxOffTime;
             sensor.minOnTime = sensor.minOnTime || this.minOnTime;
             sensor.maxOnTime = sensor.maxOnTime || this.maxOnTime;
+
+            // populate active times if necessary
+            sensor.activeTimes = sensor.activeTimes || this.activeTimes;
+            sensor.activeSeconds = new Array(sensor.activeTimes.length);
+
+            // This call computes side-effects - activeSeconds
+            this.computeStartEndTimesForSensor(x-1);
+
+            // activeTimes is just wasted space at this point
+            delete sensor.activeTimes;
         }
 
-        this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
+        this.log(`Sensors: ${JSON.stringify(this.sensors, null, 2)}`);
     }
 
     //
@@ -185,23 +191,24 @@ class AwayMode {
     // this method will be called at midnight every day.
     //
     // *** Side effects ***
-    // Sets the values for this.activeSeconds
+    // Sets the values for sensor.activeSeconds
     //
-    computeStartEndTimes() {
+    computeStartEndTimesForSensor(id) {
+        const sensor = this.sensors[id];
         let dynamic = false;
 
         let times = SunCalc.getTimes(new Date(), this.location.lat, this.location.long);
 
         // Examine each of the defined ranges
-        for (let i=0; i<this.activeTimes.length; i++) {
-            let startInfo = this.computeSecondsFromMidnight(times, this.activeTimes[i].start, this.offset);
-            let endInfo = this.computeSecondsFromMidnight(times, this.activeTimes[i].end, this.offset);
+        for (let i=0; i<sensor.activeTimes.length; i++) {
+            let startInfo = this.computeSecondsFromMidnight(times, sensor.activeTimes[i].start, this.offset);
+            let endInfo = this.computeSecondsFromMidnight(times, sensor.activeTimes[i].end, this.offset);
             dynamic = dynamic || startInfo.dynamic || endInfo.dynamic;
 
-            this.activeSeconds[i] = {start: startInfo.seconds, end: endInfo.seconds};
+            sensor.activeSeconds[i] = {start: startInfo.seconds, end: endInfo.seconds};
 
-            this.log("[" + i + "] Start: " + this.secondsToHourMinSec(this.activeSeconds[i].start) +
-                     " End: " + this.secondsToHourMinSec(this.activeSeconds[i].end));
+            this.log("[" + sensor.name + "]" + "[" + i + "] Start: " + this.secondsToHourMinSec(sensor.activeSeconds[i].start) +
+                     " End: " + this.secondsToHourMinSec(sensor.activeSeconds[i].end));
         }
 
         // Set a timer to expire at midnight so we can recalculate the
@@ -212,7 +219,7 @@ class AwayMode {
             let timeToMidnight = (tommorow-today)+5000; // +5sec to push it past
             this.log("Recompute in: " + timeToMidnight/1000);
             let timer = setTimeout(function() {
-                this.computeStartEndTimes();
+                this.computeStartEndTimesForSensor(id);
             }.bind(this), timeToMidnight);
         }
     }
@@ -221,17 +228,17 @@ class AwayMode {
     // Return true if the sensor should be turned on. I.e., now falls
     // within the startSeconds / endSeconds range.
     //
-    sensorOnTime() {
+    sensorOnTime(sensor) {
         let now = new Date();
         let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
 
         let turnOn = false;
 
         // Examine each of the defined ranges
-        for (let i=0; i<this.activeSeconds.length && turnOn == false; i++) {
-            let activeInterval = this.activeSeconds[i];
+        for (let i=0; i<sensor.activeSeconds.length && turnOn == false; i++) {
+            let activeInterval = sensor.activeSeconds[i];
 
-            this.log("[" + i + "] [" + this.secondsToHourMinSec(activeInterval.start) + " - " + this.secondsToHourMinSec(activeInterval.end) + "] --> " + this.secondsToHourMinSec(currentSeconds));
+            this.log("[" + sensor.name + "]" + "[" + i + "] [" + this.secondsToHourMinSec(activeInterval.start) + " - " + this.secondsToHourMinSec(activeInterval.end) + "] --> " + this.secondsToHourMinSec(currentSeconds));
 
             // start / end w/in same day, e.g. 08:00 - 20:00
             if (activeInterval.start <= activeInterval.end) {
@@ -263,7 +270,7 @@ class AwayMode {
 
         serviceState.timeout = setTimeout(function() {
             // Only turn on sensors during allowed times
-            if (this.sensorOnTime()) {
+            if (this.sensorOnTime(sensor)) {
                 this.log("Turning motion on for sensor: " + id);
                 serviceMotion.setCharacteristic(Characteristic.MotionDetected, true);
                 serviceState.motionDetected = true;
