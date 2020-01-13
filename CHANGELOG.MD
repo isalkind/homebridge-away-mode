@@ -3,6 +3,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.4.2 (2020-01-12)
+
+### Notable Changes
+
+* Updated CHANGELOG. Forgot to do it on 1.4.1.
+
+## 1.4.1 (2020-01-12)
+
+### Bug Fixes
+
+* Shim padStart for String on early versions of node.
+
 ## 1.4.0 (2020-01-06)
 
 ### Notable Changes
