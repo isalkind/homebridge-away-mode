@@ -36,6 +36,7 @@
 
 var TimeFormat = require('hh-mm-ss');
 var SunCalc = require('suncalc');
+var padStart = require('string.prototype.padstart');
 
 var Service, Characteristic;
 
@@ -52,6 +53,11 @@ class AwayMode {
     // Constructor. Create control switch and sensors.
     //
     constructor(log, config) {
+        // Shim padStart if it is unavailable (early versions of node)
+        if (!String.prototype.padStart) {
+            padStart.shim();
+        }
+
         this.log = log;
         this.name = config["name"] || "Away Mode";
         this.sensorNames = config["sensorNames"] || ["Trigger 1"];
