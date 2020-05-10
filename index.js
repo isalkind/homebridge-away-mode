@@ -129,17 +129,14 @@ class AwayMode {
             sensor.maxOnTime = sensor.maxOnTime || this.maxOnTime;
 
             // populate active times if necessary
-            sensor.activeTimes = sensor.activeTimes || this.activeTimes;
-            sensor.activeSeconds = new Array(sensor.activeTimes.length);
+            sensor.activeTimesForSensor = sensor.activeTimesForSensor || this.activeTimes;
+            sensor.activeSeconds = new Array(sensor.activeTimesForSensor.length);
 
             // This call computes side-effects - activeSeconds
             this.computeStartEndTimesForSensor(x-1);
-
-            // activeTimes is just wasted space at this point
-            delete sensor.activeTimes;
         }
 
-        this.log(`Sensors: ${JSON.stringify(this.sensors, null, 2)}`);
+        this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
     }
 
     //
@@ -206,9 +203,9 @@ class AwayMode {
         let times = SunCalc.getTimes(new Date(), this.location.lat, this.location.long);
 
         // Examine each of the defined ranges
-        for (let i=0; i<sensor.activeTimes.length; i++) {
-            let startInfo = this.computeSecondsFromMidnight(times, sensor.activeTimes[i].start, this.offset);
-            let endInfo = this.computeSecondsFromMidnight(times, sensor.activeTimes[i].end, this.offset);
+        for (let i=0; i<sensor.activeTimesForSensor.length; i++) {
+            let startInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].start, this.offset);
+            let endInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].end, this.offset);
             dynamic = dynamic || startInfo.dynamic || endInfo.dynamic;
 
             sensor.activeSeconds[i] = {start: startInfo.seconds, end: endInfo.seconds};
@@ -231,12 +228,19 @@ class AwayMode {
     }
 
     //
+    // Representation of current time in seconds.
+    //
+    currentSeconds() {
+        let now = new Date();
+        return (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+    }
+
+    //
     // Return true if the sensor should be turned on. I.e., now falls
     // within the startSeconds / endSeconds range.
     //
     sensorOnTime(sensor) {
-        let now = new Date();
-        let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+        let currentSeconds = this.currentSeconds();
 
         let turnOn = false;
 
@@ -249,12 +253,18 @@ class AwayMode {
             // start / end w/in same day, e.g. 08:00 - 20:00
             if (activeInterval.start <= activeInterval.end) {
                 turnOn = (activeInterval.start < currentSeconds) && (currentSeconds < activeInterval.end);
+                sensor.activePeriod = i;
             }
 
             // start / end span days, e.g. 20:00 - 08:00
             else {
                 turnOn = (activeInterval.start < currentSeconds) || (currentSeconds < activeInterval.end);
+                sensor.activePeriod = i;
             }
+        }
+
+        if (!turnOn) {
+            delete sensor.activePeriod;
         }
 
         return turnOn;
@@ -269,8 +279,7 @@ class AwayMode {
         const sensor = this.sensors[id];
 
         let time = parseInt(Math.floor(Math.random() * (sensor.maxOffTime - sensor.minOffTime + 1) + sensor.minOffTime));
-        let now = new Date();
-        let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+        let currentSeconds = this.currentSeconds();
         this.log("Starting on timer for sensor: " + id + ", delay: " + time +
                  " [" + this.secondsToHourMinSec(currentSeconds + time) + "]");
 
@@ -287,6 +296,60 @@ class AwayMode {
     }
 
     //
+    // Time (in seconds) until end of active interval. 0 if not in
+    // an active interval.
+    //
+    timeUntilEndOfInterval(sensor) {
+        let currentSeconds = this.currentSeconds();
+        let time = 0;
+
+        let activeInterval = sensor.activeSeconds[sensor.activePeriod];
+
+        // start / end w/in same day, e.g. 08:00 - 20:00
+        if (activeInterval.start <= activeInterval.end) {
+            if ((activeInterval.start < currentSeconds) && (currentSeconds < activeInterval.end)) {
+                time = activeInterval.end - currentSeconds;
+            }
+        }
+
+        // start / end span days, e.g. 20:00 - 08:00
+        else {
+            if ((activeInterval.start < currentSeconds) || (currentSeconds < activeInterval.end)) {
+                const secondsPerDay = 86400;
+
+                // before midnight --> seconds remaining in current day + seconds in next day
+                if (activeInterval.start < currentSeconds) {
+                    time = (secondsPerDay - currentSeconds) + activeInterval.end;
+                }
+                
+                // after midnight --> seconds remaining in current day
+                else {
+                    time = activeInterval.end - currentSeconds;
+                }
+            }
+        }
+
+        return time;
+    }
+
+    //
+    // Compute the off time at which to turn the given sensor off.
+    //
+    computeOffTime(sensor) {
+        let time = parseInt(Math.floor(Math.random() * (sensor.maxOnTime - sensor.minOnTime + 1) + sensor.minOnTime));
+
+        // check for a hard off time and adjust as needed
+        if ((typeof sensor.activePeriod !== 'undefined') && sensor.activeTimesForSensor[sensor.activePeriod].absolute) {
+            let maxTime = this.timeUntilEndOfInterval(sensor);
+            if (time > maxTime) {
+                time = maxTime;
+            }
+        }
+
+        return time;
+    }
+
+    //
     // Turn sensor off after a random amount of on time.
     //
     startOffTimer(id) {
@@ -294,9 +357,8 @@ class AwayMode {
         const serviceState = this.serviceStates[id];
         const sensor = this.sensors[id];
 
-        let time = parseInt(Math.floor(Math.random() * (sensor.maxOnTime - sensor.minOnTime + 1) + sensor.minOnTime));
-        let now = new Date();
-        let currentSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+        let time = this.computeOffTime(sensor);
+        let currentSeconds = this.currentSeconds();
         this.log("Starting off timer for sensor: " + id + ", delay: " + time +
                  " [" + this.secondsToHourMinSec(currentSeconds + time) + "]");
 

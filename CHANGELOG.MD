@@ -3,6 +3,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.5.0 (2020-05-10)
+
+### Notable Changes
+
+* Allow specification of active times on a per-sensor basis. See the new 'activeTimesForSensor' configuration parameter that is part of the 'sensors' configuration. Values specified by 'activeTimesForSensor' will override the global values in the 'activeTimes' configuration parameter.
+
+* The active times configuration now allows an optional parameter to be added to each active period to force any sensors to turn off when the end of the active period is reached. The default behavior allows the sensor to remain on until it naturally turns off. See the 'activeTimes' configuration parameter and optional 'absolute' element. This optional configuration is also available on the per-sensor override parameter 'activeTimesForSensor'.
+
 ## 1.4.2 (2020-01-12)
 
 ### Notable Changes
@@ -13,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-* Shim padStart for String on early versions of node.
+* Shim padStart for String on early versions of node. ([#5](https://github.com/isalkind/homebridge-away-mode/issues/5))
 
 ## 1.4.0 (2020-01-06)
 

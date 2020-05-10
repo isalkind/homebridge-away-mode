@@ -1,7 +1,6 @@
 {
     "pluginAlias": "AwayMode",
     "pluginType": "accessory",
-    "singular": false,
     "headerDisplay": "For detailed description of parameters, see: https://github.com/isalkind/homebridge-away-mode",
     "singular": false,
     "schema": {
@@ -51,6 +50,28 @@
                             "title": "Maximum On Time",
                             "type": "integer",
                             "minimum": 0
+                        },
+                        "activeTimesForSensor": {
+                            "title": "Active Time Periods",
+                            "type": "array",
+                            "items": {
+                                "title": "Time period",
+                                "type": "object",
+                                "properties": {
+                                    "start": {
+                                        "title": "Period start",
+                                        "type": "string"
+                                    },
+                                    "end": {
+                                        "title": "Period end",
+                                        "type": "string"
+                                    },
+                                    "absolute": {
+                                        "title": "Sensor off at period end",
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -97,6 +118,10 @@
                         "end": {
                             "title": "Period end",
                             "type": "string"
+                        },
+                        "absolute": {
+                            "title": "Sensors off at period end",
+                            "type": "boolean"
                         }
                     }
                 }
@@ -201,6 +226,44 @@
                                     "key": "sensors[].maxOnTime",
                                     "flex-basis": "50%",
                                     "placeholder": "seconds"
+                                },
+                                {
+                                    "type": "fieldset",
+                                    "key": "sensors[].activeTimesForSensor",
+                                    "flex-basis": "100%",
+                                    "expandable": true,
+                                    "title": "Active Periods",
+                                    "items": [
+                                        {
+                                            "key": "sensors[].activeTimesForSensor[]",
+                                            "notitle": true,
+                                            "type": "array",
+                                            "items": [
+                                                {
+                                                    "type": "div",
+                                                    "displayFlex": true,
+                                                    "flex-direction": "row",
+                                                    "flex-wrap": "wrap",
+                                                    "items": [
+                                                        {
+                                                            "key": "sensors[].activeTimesForSensor[].start",
+                                                            "flex-basis": "50%",
+                                                            "placeholder": "hh:mm | sunrise | sunset"
+                                                        },
+                                                        {
+                                                            "key": "sensors[].activeTimesForSensor[].end",
+                                                            "flex-basis": "50%",
+                                                            "placeholder": "hh:mm | sunrise | sunset"
+                                                        },
+                                                        {
+                                                            "key": "sensors[].activeTimesForSensor[].absolute",
+                                                            "flex-basis": "10%"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -248,7 +311,7 @@
                 },
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Active Period</h5><em class='primary-text'>Specify the period when sensors will be active.<br><br>DEPRECATED - See <b>Active Times</b></em>"
+                  "helpvalue": "<h5>Active Period</h5><em class='primary-text'>Specify the period when sensors will be active.<br><br>DEPRECATED - See <b>Active Periods</b></em>"
                 },
                 {
                     "type": "div",
@@ -271,7 +334,7 @@
                 },
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Active Times</h5><em class='primary-text'>Specify when sensors will be active.</em>"
+                  "helpvalue": "<h5>Active Periods</h5><em class='primary-text'>Specify when sensors will be active. Active periods specified on a per-sensor basis will override these values.</em>"
                 },
                 {
                     "key": "activeTimes",
@@ -293,6 +356,10 @@
                                     "key": "activeTimes[].end",
                                     "flex-basis": "50%",
                                     "placeholder": "hh:mm | sunrise | sunset"
+                                },
+                                {
+                                    "key": "activeTimes[].absolute",
+                                    "flex-basis": "10%"
                                 }
                             ]
                         }
