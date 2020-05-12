@@ -188,7 +188,7 @@
                 },
                 {
                     "type": "help",
-                    "helpvalue": "<h5>Sensors</h5><em class='primary-text'>Enter per sensor information. Each sensor will appear with the given name in HomeKit.</em>"
+                    "helpvalue": "<h5>Sensors</h5><em class='primary-text'>Enter per-sensor information. Each sensor will appear with the given name in HomeKit.</em>"
                 },
                 {
                     "key": "sensors",
@@ -208,24 +208,45 @@
                                     "nodescription": true
                                 },
                                 {
-                                    "key": "sensors[].minOffTime",
-                                    "flex-basis": "50%",
-                                    "placeholder": "seconds"
-                                },
-                                {
-                                    "key": "sensors[].maxOffTime",
-                                    "flex-basis": "50%",
-                                    "placeholder": "seconds"
-                                },
-                                {
-                                    "key": "sensors[].minOnTime",
-                                    "flex-basis": "50%",
-                                    "placeholder": "seconds"
-                                },
-                                {
-                                    "key": "sensors[].maxOnTime",
-                                    "flex-basis": "50%",
-                                    "placeholder": "seconds"
+                                    "type": "fieldset",
+                                    "flex-basis": "100%",
+                                    "expandable": true,
+                                    "title": "Timers",
+                                    "items": [
+                                        {
+                                            "type": "help",
+                                            "flex-basis": "100%",
+                                            "helpvalue": "<em class='primary-text'>Per-sensor timer values. These values override the Global timer values</em>"
+                                        },
+                                        {
+                                            "type": "div",
+                                            "displayFlex": true,
+                                            "flex-direction": "row",
+                                            "flex-wrap": "wrap",
+                                            "items": [
+                                                {
+                                                    "key": "sensors[].minOffTime",
+                                                    "flex-basis": "50%",
+                                                    "placeholder": "seconds"
+                                                },
+                                                {
+                                                    "key": "sensors[].maxOffTime",
+                                                    "flex-basis": "50%",
+                                                    "placeholder": "seconds"
+                                                },
+                                                {
+                                                    "key": "sensors[].minOnTime",
+                                                    "flex-basis": "50%",
+                                                    "placeholder": "seconds"
+                                                },
+                                                {
+                                                    "key": "sensors[].maxOnTime",
+                                                    "flex-basis": "50%",
+                                                    "placeholder": "seconds"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 },
                                 {
                                     "type": "fieldset",
