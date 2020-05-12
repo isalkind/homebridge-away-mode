@@ -1,5 +1,9 @@
 # homebridge-away-mode
 
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+[![mit license](https://badgen.net/badge/license/MIT/red)](https://github.com/isalkind/homebridge-away-mode/blob/master/LICENSE)
+[![npm](https://badgen.net/npm/dt/homebridge-away-mode)](https://www.npmjs.com/package/homebridge-away-mode)
+
 [Homebridge](https://homebridge.io) plugin that provides triggers to turn on and turn off lights to simulate occupancy. We provide the triggers, you provide the lights.
 
 A simulated switch is created that controls whether "away mode" is active. When the switch is on, away mode is active. When the switch is off, away mode is inactive. A set of simulated sensors detect "activity". When activity (motion) is detected, turn the light on. When activity (motion) is not detected, turn the light off. The behavior of each sensor is random: a sensor is off for a period of time, turns on for a period of time, then repeats. When the switch is turned on, the sensors are activated to start their off/on behavior. When the switch is turned off, the sensors are deactivated and turned off.
