@@ -34,13 +34,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-var TimeFormat = require('hh-mm-ss');
-var SunCalc = require('suncalc');
+const storage = require('node-persist');
+const TimeFormat = require('hh-mm-ss');
+const SunCalc = require('suncalc');
 var padStart = require('string.prototype.padstart');
 
-var Service, Characteristic;
+var Homebridge, Service, Characteristic;
 
 module.exports = function(homebridge) {
+    Homebridge = homebridge;
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
@@ -137,6 +139,23 @@ class AwayMode {
         }
 
         this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
+
+        // Restore previous state as necessary
+        setTimeout(this.restore.bind(this), 1000);
+    }
+
+    async restore() {
+        // initialize local storage
+        await storage.init({dir: Homebridge.user.persistPath(), forgiveParseErrors: true});
+
+        // retrieve previous state
+        let active = await storage.getItem('active');
+
+        if (active === 'true') {
+            this.log('Restore switch state to on');
+            this.serviceSwitch.setCharacteristic(Characteristic.On, true);
+            this.setOn(true, undefined);
+        }
     }
 
     //
@@ -409,7 +428,10 @@ class AwayMode {
     //
     // Turn switch on or off.
     //
-    setOn(on, callback) {
+    async setOn(on, callback) {
+
+        // Store the new state
+        await storage.setItem('active', on ? 'true' : 'false');
 
         // Turn away mode on, currently off
         if (on && !this.isSwitchOn) {
@@ -437,7 +459,7 @@ class AwayMode {
             }
         }
 
-        callback();
+        callback && callback();
     }
 
     //
