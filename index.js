@@ -141,19 +141,24 @@ class AwayMode {
         this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
 
         // Restore previous state as necessary
-        setTimeout(this.restore.bind(this), 1000);
+        setTimeout(this.restore.bind(this));
     }
 
     async restore() {
         // initialize local storage
         await storage.init({dir: Homebridge.user.persistPath(), forgiveParseErrors: true});
 
-        // retrieve previous state
+        // retrieve previous state - main switch
         let active = await storage.getItem('active');
 
+        // main switch previously on
         if (active === 'true') {
             this.log('Restore switch state to on');
-            this.serviceSwitch.setCharacteristic(Characteristic.On, true);
+            this.serviceSwitch.updateCharacteristic(Characteristic.On, true);
+            // set the restore flag on sensors so we check them on first activation
+            for (let i=0; i<this.sensors.length; i++) {
+                this.sensors[i].restore = true;
+            }
             this.setOn(true, undefined);
         }
     }
@@ -306,8 +311,7 @@ class AwayMode {
             // Only turn on sensors during allowed times
             if (this.sensorOnTime(sensor)) {
                 this.log("Turning motion on for sensor: " + id);
-                serviceMotion.setCharacteristic(Characteristic.MotionDetected, true);
-                serviceState.motionDetected = true;
+                this.setSensorOn(id, true);
             }
 
             this.startOffTimer(id);
@@ -383,8 +387,7 @@ class AwayMode {
 
         serviceState.timeout = setTimeout(function() {
             this.log("Turning motion off for sensor: " + id);
-            serviceMotion.setCharacteristic(Characteristic.MotionDetected, false);
-            serviceState.motionDetected = false;
+            this.setSensorOn(id, false);
 
             this.startOnTimer(id);
         }.bind(this), time*this.multiplier);
@@ -393,10 +396,56 @@ class AwayMode {
     //
     // Initialize the sensor.
     //
-    startSensor(id) {
+    async startSensor(id) {
         this.log("Starting sensor: " + id);
 
-        this.startOnTimer(id);
+        // restore flag set for this sensor - check it - start up only
+        if (this.sensors[id].restore) {
+            let sensor = this.sensors[id];
+            let isOn = await storage.getItem(sensor.name);
+
+            // we only do this once
+            delete sensor.restore;
+
+            // On when we quit and still can be on
+            if (isOn === 'true' && this.sensorOnTime(sensor)) {
+                this.log(`Restore sensor [${sensor.name}] to on`);
+
+                // restore sensor to motion detected
+                this.log("Turning motion on for sensor: " + id);
+                this.setSensorOn(id, true);
+
+                // start 'off' timer
+                this.startOffTimer(id);
+            }
+
+            // On when we quit, but shouldn't be on now
+            // Note: We trigger it on first, then turn it off,
+            //       otherwise the off won't be sent out because
+            //       the homebridge/hap (?) framework thinks it's off.
+            else if (isOn === 'true') {
+                this.log("Turning motion off for sensor: " + id);
+
+                // turn it on first
+                this.setSensorOn(id, true);
+
+                // then turn it off after delay and start on timer
+                setTimeout(function(idx, on) {
+                    this.setSensorOn(idx, on);
+                    this.startOnTimer(idx);
+                }.bind(this), 15000, id, false);
+            }
+
+            // Off when we quit - delay before turning on
+            else {
+                this.startOnTimer(id);
+            }
+        }
+        
+        // standard start for sensor - delay before turning on
+        else {
+            this.startOnTimer(id);
+        }
     }
 
     //
@@ -405,7 +454,6 @@ class AwayMode {
     stopSensor(id) {
         this.log("Stopping sensor: " + id);
 
-        const serviceMotion = this.serviceMotions[id];
         const serviceState = this.serviceStates[id];
         const motionDetected = serviceState.motionDetected;
         const timeout = serviceState.timeout;
@@ -420,9 +468,17 @@ class AwayMode {
         // Sensor is currently on, turn it off
         if (motionDetected) {
             this.log("Turning motion off for sensor: " + id);
-            serviceMotion.setCharacteristic(Characteristic.MotionDetected, false);
-            serviceState.motionDetected = false;
+            this.setSensorOn(id, false);
         }
+    }
+
+    //
+    // Activate or deactivate a sensor.
+    // 
+    async setSensorOn(id, on) {
+        this.serviceMotions[id].updateCharacteristic(Characteristic.MotionDetected, on);
+        this.serviceStates[id].motionDetected = on;
+        await storage.setItem(this.sensors[id].name, on ? 'true' : 'false');
     }
 
     //

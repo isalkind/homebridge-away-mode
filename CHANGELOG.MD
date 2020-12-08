@@ -3,6 +3,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.5.2 (2020-12-08)
+
+### Notable Changes
+
+* Restore sensors to their previous state after restart if homebridge was restarted while the 'Away Mode' switch was on.
+
+## 1.5.1 (2020-11-28)
+
+### Notable Changes
+
+* Maintain switch state across restarts. If the homebridge is restarted while the 'Away Mode' switch is on, activities will be resumed after the restart. ([#8](https://github.com/isalkind/homebridge-away-mode/issues/8))
+
 ## 1.5.0 (2020-05-11)
 
 ### Notable Changes

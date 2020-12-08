@@ -8,6 +8,17 @@
 
 A simulated switch is created that controls whether "away mode" is active. When the switch is on, away mode is active. When the switch is off, away mode is inactive. A set of simulated sensors detect "activity". When activity (motion) is detected, turn the light on. When activity (motion) is not detected, turn the light off. The behavior of each sensor is random: a sensor is off for a period of time, turns on for a period of time, then repeats. When the switch is turned on, the sensors are activated to start their off/on behavior. When the switch is turned off, the sensors are deactivated and turned off.
 
+## Homebridge Restart
+
+The plugin attempts to restore itself to the its previous state if a restart occurs and the "away mode" switch is on:
+1. The "away mode" switch is turned on.
+1. For any sensor that was previously on:
+    1. If the sensor is still allowed to be on, it is turned on and the normal on/off sequence is resumed, starting from on.
+    1. If the sensor is not allowed to turn on, it is not turned on and the normal on/off sequence is resumed, starting from off.
+1. Any sensor that was previously off will begin its on/off sequence, starting from off.
+
+_**Caveat** - Because the plugin does not track how long a sensor had been on (or off) when a restart occurred, it is possible that the sensor will be on (or off) longer than the settings would normally allow. This will only effect the first sequence following the restart._
+
 # Installation
 
 npm -g install homebridge-away-mode
