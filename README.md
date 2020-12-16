@@ -3,6 +3,7 @@
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![mit license](https://badgen.net/badge/license/MIT/red)](https://github.com/isalkind/homebridge-away-mode/blob/master/LICENSE)
 [![npm](https://badgen.net/npm/dt/homebridge-away-mode)](https://www.npmjs.com/package/homebridge-away-mode)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/isalkind)
 
 [Homebridge](https://homebridge.io) plugin that provides triggers to turn on and turn off lights to simulate occupancy. We provide the triggers, you provide the lights.
 
