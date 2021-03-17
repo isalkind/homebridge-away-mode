@@ -26,5 +26,9 @@
     "node-persist": "^3.1.0",
     "string.prototype.padstart": "^3.1.0",
     "suncalc": ">=1.8.0"
+  },
+  "funding": {
+    "type" : "paypal",
+    "url" : "https://paypal.me/isalkind"
   }
 }

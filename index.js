@@ -124,6 +124,8 @@ class AwayMode {
             this.serviceMotions.push(serviceMotion);
             this.serviceStates.push(serviceState);
 
+            sensor.id = x - 1;
+
             // populate sensor defaults if necessary
             sensor.minOffTime = sensor.minOffTime || this.minOffTime;
             sensor.maxOffTime = sensor.maxOffTime || this.maxOffTime;
@@ -277,18 +279,33 @@ class AwayMode {
             // start / end w/in same day, e.g. 08:00 - 20:00
             if (activeInterval.start <= activeInterval.end) {
                 turnOn = (activeInterval.start < currentSeconds) && (currentSeconds < activeInterval.end);
-                sensor.activePeriod = i;
             }
 
             // start / end span days, e.g. 20:00 - 08:00
             else {
                 turnOn = (activeInterval.start < currentSeconds) || (currentSeconds < activeInterval.end);
-                sensor.activePeriod = i;
             }
-        }
 
-        if (!turnOn) {
-            delete sensor.activePeriod;
+            // may turn on during this period, evaluate for maximum activiations
+            if (turnOn) {
+                // active period has changed, start counting activations
+                if ((typeof sensor.activePeriod === 'undefined') || (sensor.activePeriod != i)) {
+                    sensor.activeTimesForSensor[i].activationCount = 0;
+                    sensor.activePeriod = i;
+                }
+
+                // same active period, check for maximum activations (if specified),
+                // if max activations has been reached, then don't turn it on,
+                // but we stay in the same period
+                else if (sensor.activeTimesForSensor[i].maxActivations && 
+                         sensor.activeTimesForSensor[i].activationCount >= sensor.activeTimesForSensor[i].maxActivations) {
+                    this.log(`Max activations: ${sensor.activeTimesForSensor[i].maxActivations}, sensor: ${sensor.id}`);
+                    turnOn = false;
+                    break;
+                }
+            } else {
+                delete sensor.activePeriod;
+            }
         }
 
         return turnOn;
@@ -312,6 +329,7 @@ class AwayMode {
             if (this.sensorOnTime(sensor)) {
                 this.log("Turning motion on for sensor: " + id);
                 this.setSensorOn(id, true);
+                sensor.activeTimesForSensor[sensor.activePeriod].activationCount++;
             }
 
             this.startOffTimer(id);
@@ -414,6 +432,7 @@ class AwayMode {
                 // restore sensor to motion detected
                 this.log("Turning motion on for sensor: " + id);
                 this.setSensorOn(id, true);
+                sensor.activeTimesForSensor[sensor.activePeriod].activationCount++;
 
                 // start 'off' timer
                 this.startOffTimer(id);
@@ -469,6 +488,12 @@ class AwayMode {
         if (motionDetected) {
             this.log("Turning motion off for sensor: " + id);
             this.setSensorOn(id, false);
+        }
+
+        // Reset the active period
+        let sensor = this.sensors[id];
+        if (typeof sensor.activePeriod !== 'undefined') {
+            delete sensor.activePeriod;
         }
     }
 

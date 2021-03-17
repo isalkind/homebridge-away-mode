@@ -69,6 +69,10 @@
                                     "absolute": {
                                         "title": "Sensor off at period end",
                                         "type": "boolean"
+                                    },
+                                    "maxActivations": {
+                                        "title": "Maxium number of activations per period",
+                                        "type": "integer"
                                     }
                                 }
                             }
@@ -122,6 +126,10 @@
                         "absolute": {
                             "title": "Sensors off at period end",
                             "type": "boolean"
+                        },
+                        "maxActivations": {
+                            "title": "Maxium number of activations per period",
+                            "type": "integer"
                         }
                     }
                 }
@@ -279,6 +287,10 @@
                                                         {
                                                             "key": "sensors[].activeTimesForSensor[].absolute",
                                                             "flex-basis": "10%"
+                                                        },
+                                                        {
+                                                            "key": "sensors[].activeTimesForSensor[].maxActivations",
+                                                            "flex-basis": "10%"
                                                         }
                                                     ]
                                                 }
@@ -380,6 +392,10 @@
                                 },
                                 {
                                     "key": "activeTimes[].absolute",
+                                    "flex-basis": "10%"
+                                },
+                                {
+                                    "key": "activeTimes[].maxActivations",
                                     "flex-basis": "10%"
                                 }
                             ]
