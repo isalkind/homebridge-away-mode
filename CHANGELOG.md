@@ -3,6 +3,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.6.0 (2021-03-17)
+
+### Notable Changes
+
+* Allow user to specify maximum number of activations for a sensor for each active period. May be specified globally or per-sensor. See configuration of 'Active Periods'. ([#10](https://github.com/isalkind/homebridge-away-mode/issues/10))
+
 ## 1.5.2 (2020-12-08)
 
 ### Notable Changes
