@@ -76,6 +76,20 @@
                                     }
                                 }
                             }
+                        },
+                        "offset": {
+                            "title": "Offset information for sunrise/sunset",
+                            "type": "object",
+                            "properties": {
+                                "sunrise": {
+                                    "title": "Sunrise",
+                                    "type": "integer"
+                                },
+                                "sunset": {
+                                    "title": "Sunset",
+                                    "type": "integer"
+                                }
+                            }
                         }
                     }
                 }
@@ -297,6 +311,36 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "type": "fieldset",
+                                    "expandable": true,
+                                    "title": "Sunrise/Sunset Setup",
+                                    "items": [
+                                        {
+                                          "type": "help",
+                                          "helpvalue": "<h5>Offsets</h5><em class='primary-text'>Specify per-sensor offsets to sunrise and sunset values. These values override the global offsets. Specify negative values for before. Positive values for after.</em>"
+                                        },
+                                        {
+                                            "type": "div",
+                                            "notitle": true,
+                                            "displayFlex": true,
+                                            "flex-direction": "row",
+                                            "flex-wrap": "wrap",
+                                            "items": [
+                                                {
+                                                    "key": "sensors[].offset.sunrise",
+                                                    "placeholder": "minutes",
+                                                    "flex-basis": "50%"
+                                                },
+                                                {
+                                                    "key": "sensors[].offset.sunset",
+                                                    "placeholder": "minutes",
+                                                    "flex-basis": "50%"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -434,7 +478,7 @@
                 },
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Offsets</h5><em class='primary-text'>Specify offsets to sunrise and sunset values. Specify negative values for before. Positive values for after.</em>"
+                  "helpvalue": "<h5>Offsets</h5><em class='primary-text'>Specify offsets to sunrise and sunset values. Specify negative values for before. Positive values for after. Offsets specified on a per-sensor basis will override these values.</em>"
                 },
                 {
                     "type": "div",

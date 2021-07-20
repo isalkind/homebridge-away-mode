@@ -3,6 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.6.1 (2021-07-20)
+
+* Allow user to specify sunrise/sunset offsets on a per-sensor basis. See configuration of 'offset'. ([#12](https://github.com/isalkind/homebridge-away-mode/issues/12))
+
 ## 1.6.0 (2021-03-17)
 
 ### Notable Changes

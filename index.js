@@ -131,6 +131,7 @@ class AwayMode {
             sensor.maxOffTime = sensor.maxOffTime || this.maxOffTime;
             sensor.minOnTime = sensor.minOnTime || this.minOnTime;
             sensor.maxOnTime = sensor.maxOnTime || this.maxOnTime;
+            sensor.offset = sensor.offset || this.offset;
 
             // populate active times if necessary
             sensor.activeTimesForSensor = sensor.activeTimesForSensor || this.activeTimes;
@@ -230,8 +231,8 @@ class AwayMode {
 
         // Examine each of the defined ranges
         for (let i=0; i<sensor.activeTimesForSensor.length; i++) {
-            let startInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].start, this.offset);
-            let endInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].end, this.offset);
+            let startInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].start, sensor.offset);
+            let endInfo = this.computeSecondsFromMidnight(times, sensor.activeTimesForSensor[i].end, sensor.offset);
             dynamic = dynamic || startInfo.dynamic || endInfo.dynamic;
 
             sensor.activeSeconds[i] = {start: startInfo.seconds, end: endInfo.seconds};
