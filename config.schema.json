@@ -71,7 +71,7 @@
                                         "type": "boolean"
                                     },
                                     "maxActivations": {
-                                        "title": "Maxium number of activations per period",
+                                        "title": "Maximum number of activations per period",
                                         "type": "integer"
                                     }
                                 }
