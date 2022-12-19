@@ -3,7 +3,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.6.2 (2022-12-19)
+
+### Notable Changes
+
+* Maintenance release
+
+* Update dependencies
+
+* Add metadata to the 'Away Mode' accessory
+
+### Other Changes
+
+* Update the coordinate helper links
+
+* Add note in README about HomeKit changes that result in configured sensor names being ignored
+
 ## 1.6.1 (2021-07-20)
+
+### Notable Changes
 
 * Allow user to specify sunrise/sunset offsets on a per-sensor basis. See configuration of 'offset'. ([#12](https://github.com/isalkind/homebridge-away-mode/issues/12))
 
