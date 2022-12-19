@@ -7,11 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Notable Changes
 
-* Maintenance release
-
 * Update dependencies
-
-* Add metadata to the 'Away Mode' accessory
 
 ### Other Changes
 
