@@ -84,14 +84,8 @@ class AwayMode {
 
         this.isSwitchOn = false;
 
-        // Add metadata to the accessory
-        this.information = new Service.AccessoryInformation();
-        this.information
-            .updateCharacteristic(Characteristic.Model, 'Away Mode')
-            .updateCharacteristic(Characteristic.Name, 'Away Mode');
-
         // Create switch to turn on/off away mode
-        this.serviceSwitch = new Service.Switch(this.name, 'switch');
+        this.serviceSwitch = new Service.Switch(this.name);
         this.log("Switch: " + this.name);
 
         this.serviceSwitch
@@ -117,7 +111,7 @@ class AwayMode {
 
         for (let x = 1; x <= this.sensors.length; x++) {
             let sensor = this.sensors[x-1];
-            let serviceMotion = new Service.MotionSensor(sensor.name, 'sensor.' + x);
+            let serviceMotion = new Service.MotionSensor(sensor.name, x);
             this.log("MotionSensor: " + sensor.name);
 
             let serviceState = { "motionDetected": false };
@@ -554,6 +548,6 @@ class AwayMode {
     // Share services that have been created.
     //
     getServices() {
-        return [this.serviceSwitch, this.information, ...this.serviceMotions];
+        return [this.serviceSwitch, ...this.serviceMotions];
     }
 }
