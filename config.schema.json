@@ -455,7 +455,7 @@
             "items": [
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Location</h5><em class='primary-text'>Location from which sunrise and sunset times should be computed. See <a href=\"https://google-developers.appspot.com/maps/documentation/utils/geocoder/\">Google Maps location finder</a>.</em>"
+                  "helpvalue": "<h5>Location</h5><em class='primary-text'>Location from which sunrise and sunset times should be computed. See <a href=\"https://www.gps-coordinates.net/\">GPS Coordinates</a>.</em>"
                 },
                 {
                     "type": "div",
