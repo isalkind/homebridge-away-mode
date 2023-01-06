@@ -30,7 +30,7 @@
 // offset - Offset information for sunrise/sunset ({sunrise: mins, sunset: mins}). ({sunrise: 0, sunset: 0})
 //
 // User location can be found with:
-//     https://google-developers.appspot.com/maps/documentation/utils/geocoder/
+//     https://www.gps-coordinates.net/
 //
 ////////////////////////////////////////////////////////////////////////////////
 
