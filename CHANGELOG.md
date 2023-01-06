@@ -3,6 +3,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.6.3 (2022-01-06)
+
+### Notable Changes
+
+* Consistently log sensor name and id to make logs easier to navigate. Thanks @[primdahl](https://github.com/primdahl)! ([#18](https://github.com/isalkind/homebridge-away-mode/pull/18))
+
+### Other Changes
+
+* Update the coordinate helper link in code comment
+
 ## 1.6.2 (2022-12-19)
 
 ### Notable Changes
