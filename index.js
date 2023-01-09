@@ -114,6 +114,13 @@ class AwayMode {
             sensor.id = x - 1;
 
             let serviceMotion = new Service.MotionSensor(sensor.name, x);
+
+            // ConfiguredName characteristic ensure that the configured name
+            // is exposed to HomeKit. This corrects a change in HomeKit that
+            // prevented the configured name from appearing properly.
+            serviceMotion.addOptionalCharacteristic(Characteristic.ConfiguredName);
+            serviceMotion.setCharacteristic(Characteristic.ConfiguredName, sensor.name);
+
             this.sensorLog(sensor, "Configuring motion sensor");
 
             let serviceState = { "motionDetected": false };
