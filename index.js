@@ -121,7 +121,7 @@ class AwayMode {
             serviceMotion.addOptionalCharacteristic(Characteristic.ConfiguredName);
             serviceMotion.setCharacteristic(Characteristic.ConfiguredName, sensor.name);
 
-            this.sensorLog(sensor, "Configuring motion sensor");
+            this.sensorLogDebug(sensor, "Configuring motion sensor");
 
             let serviceState = { "motionDetected": false };
 
@@ -140,6 +140,10 @@ class AwayMode {
             sensor.maxOnTime = sensor.maxOnTime || this.maxOnTime;
             sensor.offset = sensor.offset || this.offset;
 
+            // summarise timer for each sensor (rather than dumping whole JSON object)
+            this.sensorLog(sensor, "Timer On: " + sensor.minOnTime + "-" + sensor.maxOnTime +
+		"s, Off: " + sensor.minOffTime + "-" + sensor.maxOffTime + "s");
+
             // populate active times if necessary
             sensor.activeTimesForSensor = sensor.activeTimesForSensor || this.activeTimes;
             sensor.activeSeconds = new Array(sensor.activeTimesForSensor.length);
@@ -148,7 +152,7 @@ class AwayMode {
             this.computeStartEndTimesForSensor(x-1);
         }
 
-        this.log(`Sensors: ${JSON.stringify(this.sensors)}`);
+        this.log.debug(`Sensors: ${JSON.stringify(this.sensors)}`);
 
         // Restore previous state as necessary
         setTimeout(this.restore.bind(this));
@@ -196,6 +200,9 @@ class AwayMode {
 
     sensorLog(sensor, message) {
         this.log(sensor.name+" ("+sensor.id+"): "+message);
+    }
+    sensorLogDebug(sensor, message) {	// more verbose logging when using homebridge debug mode -D
+        this.log.debug(sensor.name+" ("+sensor.id+"): "+message);
     }
 
     //
@@ -260,7 +267,7 @@ class AwayMode {
             let today = new Date();
             let tommorow = new Date(today.getFullYear(),today.getMonth(),today.getDate()+1);
             let timeToMidnight = (tommorow-today)+5000; // +5sec to push it past
-            this.sensorLog(sensor, "Recompute in: " + timeToMidnight/1000);
+            this.sensorLogDebug(sensor, "Recompute in: " + timeToMidnight/1000);
             let timer = setTimeout(function() {
                 this.computeStartEndTimesForSensor(id);
             }.bind(this), timeToMidnight);
@@ -288,7 +295,7 @@ class AwayMode {
         for (let i=0; i<sensor.activeSeconds.length && turnOn == false; i++) {
             let activeInterval = sensor.activeSeconds[i];
 
-            this.sensorLog(sensor,
+            this.sensorLogDebug(sensor,
                 "Active range " + i + " [" + this.secondsToHourMinSec(activeInterval.start) + " - " +
                 this.secondsToHourMinSec(activeInterval.end) + "] --> " + this.secondsToHourMinSec(currentSeconds)
             );
@@ -338,13 +345,13 @@ class AwayMode {
 
         let time = parseInt(Math.floor(Math.random() * (sensor.maxOffTime - sensor.minOffTime + 1) + sensor.minOffTime));
         let currentSeconds = this.currentSeconds();
-        this.sensorLog(sensor, "Starting on timer, delay: " + time +
+        this.sensorLogDebug(sensor, "Starting on timer, delay: " + time +
                  " [" + this.secondsToHourMinSec(currentSeconds + time) + "]");
 
         serviceState.timeout = setTimeout(function() {
             // Only turn on sensors during allowed times
             if (this.sensorOnTime(sensor)) {
-                this.sensorLog(sensor, "Turning motion on");
+                this.sensorLogDebug(sensor, "Turning motion on");
                 this.setSensorOn(id, true);
                 sensor.activeTimesForSensor[sensor.activePeriod].activationCount++;
             }
@@ -417,12 +424,14 @@ class AwayMode {
 
         let time = this.computeOffTime(sensor);
         let currentSeconds = this.currentSeconds();
-        this.sensorLog(sensor,
+        this.sensorLogDebug(sensor,
             "Starting off timer, delay: " + time + " [" + this.secondsToHourMinSec(currentSeconds + time) + "]"
         );
-
+        if (this.sensorOnTime(sensor)) {	// seems more compact and intuitive to log like this
+            this.sensorLog(sensor,"Motion on for " + time + "s until [" + this.secondsToHourMinSec(currentSeconds + time) + "]");
+        }
         serviceState.timeout = setTimeout(function() {
-            this.sensorLog(sensor, "Turning motion off");
+            this.sensorLogDebug(sensor, "Turning motion off");
             this.setSensorOn(id, false);
 
             this.startOnTimer(id);
@@ -499,14 +508,14 @@ class AwayMode {
 
         // Timeout currently set, cancel
         if (timeout) {
-            this.sensorLog(sensor, "Stopping timer");
+            this.sensorLogDebug(sensor, "Stopping timer");
             clearTimeout(timeout);
             delete serviceState.timeout;
         }
 
         // Sensor is currently on, turn it off
         if (motionDetected) {
-            this.sensorLog(sensor, "Turning motion off");
+            this.sensorLogDebug(sensor, "Turning motion off");
             this.setSensorOn(id, false);
         }
 
