@@ -198,11 +198,18 @@ class AwayMode {
                r.toString().padStart(2, '0');
     }
 
+    //
+    // Log sensor information.
+    //
     sensorLog(sensor, message) {
-        this.log(sensor.name+" ("+sensor.id+"): "+message);
+        this.log(sensor.name + " (" + sensor.id + "): " + message);
     }
-    sensorLogDebug(sensor, message) {	// more verbose logging when using homebridge debug mode -D
-        this.log.debug(sensor.name+" ("+sensor.id+"): "+message);
+
+    //
+    // More verbose sensor logging when using homebridge debug mode -D
+    //
+    sensorLogDebug(sensor, message) {
+        this.log.debug(sensor.name + " (" + sensor.id + "): " +message);
     }
 
     //

@@ -154,3 +154,7 @@ Time examples:
 | "sunset" | "22:00" | {"sunset":-15} | Span the hours from 15 minutes before sunset to 10pm. Sunset is computed based on the location you provide. |
 | "23:00" | "sunrise" | {"sunrise":30} | Span the hours from 11pm to 30 minutes after sunrise. Sunrise is computed based on the location you provide. |
 | "sunrise" | "sunset" | {"sunrise":-15, "sunset":15} | Span the hours from 15 minutes before sunrise to 15 minutes after sunset. Sunrise and sunset are computed based on the location you provide. |
+
+# Logging
+
+Use the `-D` option on Homebridge to enable verbose logging for this plugin.

@@ -3,13 +3,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## 1.6.4 (2022-01-08)
+## 1.6.5 (2023-04-27)
 
 ### Notable Changes
 
-* Add ConfiguredName characteristic to motion sensors to ensure that configured value is used when the sensor is exposed to HomeKit. Resolution for Issues [#16](https://github.com/isalkind/homebridge-away-mode/issues/16) and [#20](https://github.com/isalkind/homebridge-away-mode/issues/20).
+* Update to reduce verbosity of logging. See the *Logging* section in the [README](https://github.com/isalkind/homebridge-away-mode#logging). Thanks @[PuzzledUser](https://github.com/PuzzledUser)! ([#24](https://github.com/isalkind/homebridge-away-mode/issues/24))
 
-## 1.6.3 (2022-01-06)
+## 1.6.4 (2023-01-08)
+
+### Notable Changes
+
+* Add ConfiguredName characteristic to motion sensors to ensure that configured value is used when the sensor is exposed to HomeKit. Resolution for Issues ([#16](https://github.com/isalkind/homebridge-away-mode/issues/16)) and ([#20](https://github.com/isalkind/homebridge-away-mode/issues/20)).
+
+## 1.6.3 (2023-01-06)
 
 ### Notable Changes
 
