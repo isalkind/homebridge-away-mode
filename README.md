@@ -12,6 +12,7 @@ A simulated switch is created that controls whether "away mode" is active. When 
 ## Homebridge Restart
 
 The plugin attempts to restore itself to the its previous state if a restart occurs and the "away mode" switch is on:
+
 1. The "away mode" switch is turned on.
 1. For any sensor that was previously on:
     1. If the sensor is still allowed to be on, it is turned on and the normal on/off sequence is resumed, starting from on.
@@ -30,7 +31,8 @@ It is highly recommended to use the [homebridge-config-ui-x](https://www.npmjs.c
 
 ### Simple configuration example
 config.json:
-```
+
+```json
 "accessories": [
     {
         "accessory": "AwayMode",
@@ -50,19 +52,23 @@ config.json:
     }
 ]
 ```
+
 The above example creates a switch called 'Away Mode' and two sensors: 'Trigger 1' and 'Trigger 2'. A sensor will remain off for 300 to 1800 seconds (5 minutes to 1/2 hour). A sensor will remain on for 1800 to 3600 seconds (1/2 hour to 1 hour). Sensors will only be active when the 'Away Mode' switch is turned on.
 
 In this example, you use your automation software to turn the 'Away Mode' switch on when you want the sensors to be active (turn on & off), and off when you don't want them to be active.
 ##### HomeKit
 In Home (or any of the HomeKit compatible apps), you will see three new devices exposed:
+
 * 1 switch named 'Away Mode'
 * 2 motion sensors named 'Trigger 1' and 'Trigger 2'
 
 Automate the switch to turn on and off at specific times. For example:
+
 * 15 minutes before sunset (daily), turn the switch on
 * At 10:00pm (daily), turn the switch off
 
 Automate the motions sensors. For Example:
+
 * When motion is detected ('Trigger 1'), turn 'Lamp 1' on
 * When no motion is detected ('Trigger 1'), turn 'Lamp 1' off
 
@@ -70,7 +76,8 @@ This setup makes sense when you know you will be away from your house for an ext
 
 ### Advanced configuration example
 config.json:
-```
+
+```json
 "accessories": [
     {
         "accessory": "AwayMode",
@@ -104,6 +111,7 @@ config.json:
     }
 ]
 ```
+
 The above example creates a switch called 'Away Mode' and two sensors: 'Trigger 1' and 'Trigger 2'. A sensor will remain off for 300 to 1800 seconds (5 minutes to 1/2 hour). A sensor will remain on for 1800 to 3600 seconds (1/2 hour to 1 hour). Sensors will only be active when the 'Away Mode' switch is turned on. Sensors will only turn on from 15 minutes before sunset to 10:00pm. The location information is used to compute the values for sunrise/sunset (as needed).
 
 In this example, you might use your automation software to detect when your residence is not occupied and turn on the 'Away Mode' and turn if off when the residence is occupied. However, you only want the sensors turning on and off during a specific period of the day.
@@ -111,15 +119,19 @@ In this example, you might use your automation software to detect when your resi
 **Note**: This can *mostly* be accomplished using HomeKit and the simple configuration. However, HomeKit does not allow you to mix specific times (eg., 10:00pm) with sunrise/sunset times.
 
 ##### HomeKit
+
 In Home (or any of the HomeKit compatible apps), you will see three new devices exposed:
+
 * 1 switch named 'Away Mode'
 * 2 motion sensors named 'Trigger 1' and 'Trigger 2'
 
 Automate the switch to turn on and off based on specific conditions. For example:
+
 * When the last person leaves home, turn the switch on
 * When the first person arrives home, turn the switch off
 
 Automate the motions sensors. For Example:
+
 * When motion is detected ('Trigger 1'), turn 'Lamp 1' on
 * When no motion is detected ('Trigger 1'), turn 'Lamp 1' off
 
@@ -140,6 +152,7 @@ This setup makes sense when you want to make sure the automation always runs whe
 | startTime | Time at which triggers should start to fire<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter. If the 'activeTimes' parameter is specified, this will be ignored. | "00:00" |
 | endTime | Time at which triggers should stop firing<br>("hh:mm"\|"sunrise"\|"sunset")<br><br>**DEPRECATED** - See 'activeTimes' parameter. If the 'activeTimes' parameter is specified, this will be ignored. | "23:59" |
 | activeTimes | Array of start/end times for periods when triggers should fire.<br>Set start/end times as: ("hh:mm"\|"sunrise"\|"sunset")<br><br>You may also include the optional "absolute" parameter as: (true\|false). When set to true, sensors will turn off immediately when the end time is reached (if one is on).<br><br>You may also include the optional "maxActivations" parameter as: (integer). When set, it indicates the maximum number of times the sensor will be activated during period.<br><br>Example 1: [{"start": "sunset", "end": "22:00"}]<br><br>Example 2: [{"start": "sunset", "end": "22:00", "absolute": true, "maxActivations": 1}]| [{"start": "00:00", "end": "23:59"}] |
+| maxOnSensors | Limits the maximum number of sensors that may be on at once.<br><br>0 specifies "no limit". | 0 |
 | location | Lat/long location to compute sunrise/sunset from. Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"lat": x, "long": y}) <br><br>Find your location: [GPS Coordinates](https://www.gps-coordinates.net/) | {"lat": 0, "long": 0} |
 | offset | Offset information for sunrise/sunset. Offset is in minutes. May be negative (before) or positive (after). Use in conjunction with "startTime"\|"endTime" when they are set to "sunrise"\|"sunset".<br>({"sunrise": mins, "sunset": mins}) | {"sunrise": 0, "sunset": 0} |
 

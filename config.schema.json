@@ -148,6 +148,11 @@
                     }
                 }
             },
+            "maxOnSensors": {
+                "title": "Maximum number of sensors on at a time",
+                "type": "integer",
+                "minimum": 0
+            },
             "location": {
                 "title": "Location to compute sunrise/sunset from",
                 "type": "object",
@@ -443,6 +448,24 @@
                                     "flex-basis": "10%"
                                 }
                             ]
+                        }
+                    ]
+                },
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Miscellaneous</h5><em class='primary-text'>One-off configuration items.</em>"
+                },
+                {
+                    "type": "div",
+                    "notitle": true,
+                    "displayFlex": true,
+                    "flex-direction": "row",
+                    "flex-wrap": "wrap",
+                    "items": [
+                        {
+                            "key": "maxOnSensors",
+                            "placeholder": "count",
+                            "flex-basis": "50%"
                         }
                     ]
                 }

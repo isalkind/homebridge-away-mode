@@ -3,6 +3,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.6.6 (2023-12-20)
+
+### Notable Changes
+
+* Add ability to limit the number of sensors that are on at one time. See the new global configuration parameter `maxOnSensors`.
+* Update configuration schema for config-ui-x support of new parameter. Can be found in the `Global Settings / Miscellaneous` section.
+* Update README for new parameter.
+* Update dependencies
+
 ## 1.6.5 (2023-04-27)
 
 ### Notable Changes

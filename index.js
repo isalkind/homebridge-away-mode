@@ -79,6 +79,8 @@ class AwayMode {
         this.location = config["location"] || {lat:0, long:0};
         this.offset = config["offset"] || {sunrise:0, sunset:0}; // 0 min (mins)
 
+        this.maxOnSensors = config["maxOnSensors"] || 0; // No max
+
         // Multiplier to get to timer values (in milliseconds)
         this.multiplier = 1000;
 
@@ -290,6 +292,21 @@ class AwayMode {
     }
 
     //
+    // Return a count of the number of sensors currently on.
+    //
+    countOfOnSensors() {
+        let count = 0;
+
+        for (let id = 0; id < this.sensors.length; id++) {
+            if (this.serviceStates[id].motionDetected) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    //
     // Return true if the sensor should be turned on. I.e., now falls
     // within the startSeconds / endSeconds range.
     //
@@ -331,6 +348,13 @@ class AwayMode {
                 else if (sensor.activeTimesForSensor[i].maxActivations &&
                          sensor.activeTimesForSensor[i].activationCount >= sensor.activeTimesForSensor[i].maxActivations) {
                     this.sensorLog(sensor, `Max activations: ${sensor.activeTimesForSensor[i].maxActivations}`);
+                    turnOn = false;
+                    break;
+                }
+
+                // check to see if we have reached the maximum number of on sensors
+                if (this.maxOnSensors && (this.countOfOnSensors() >= this.maxOnSensors)) {
+                    this.sensorLog(sensor, `Max on sensors: ${this.maxOnSensors}`);
                     turnOn = false;
                     break;
                 }
@@ -434,7 +458,7 @@ class AwayMode {
         this.sensorLogDebug(sensor,
             "Starting off timer, delay: " + time + " [" + this.secondsToHourMinSec(currentSeconds + time) + "]"
         );
-        if (this.sensorOnTime(sensor)) {	// seems more compact and intuitive to log like this
+        if (serviceState.motionDetected) {	// seems more compact and intuitive to log like this
             this.sensorLog(sensor,"Motion on for " + time + "s until [" + this.secondsToHourMinSec(currentSeconds + time) + "]");
         }
         serviceState.timeout = setTimeout(function() {
